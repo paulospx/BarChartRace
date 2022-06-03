@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <title>Cumulative Values Calculator</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="icon" href="css/favicon.png">
+
+    </head>
+    <body>
+        <main class="main-content">
+            <div class="card-border">
+                <div class="card-body">
+                    <h1>Cumulative Generator</h1>
+                    <textarea id="csv" style="height:300px;width:500;"></textarea>
+                    <textarea id="csv_result" style="height:300px;width:500;"></textarea>
+                    <button onclick="getCsv()">CSV</button>
+                </div>
+            </div>
+        </main>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+        <script>
+            function unique(value, index, self) {
+                return self.indexOf(value) === index;
+            }
+
+            function getCsv() {
+                var txt = document.getElementById("csv").value;
+                var lines = txt.split(/\r\n|\n/);
+
+                var date_list = [];
+                var name_list = [];
+                var full_list = []; 
+
+                lines.forEach(element => {
+                    var parts = element.split(',');
+                    name_list.push(parts[1]);
+                    date_list.push(parts[0]);
+                    full_list.push({ date: parts[0], name: parts[1], value:parts[2] });
+                });
+
+                var text = '';
+                var unique_names = name_list.filter(unique);
+                var unique_dates = date_list.filter(unique).sort();
+                unique_dates.forEach(d => {
+                    var cum_val = 0;
+                    unique_names.forEach(n => {
+                        var ffl = full_list.filter(f => f.date <= d && f.name == n);
+                        ffl.forEach(f => cum_val += parseFloat(f.value));
+                        console.log(`${d},${n},${cum_val}`);
+                        text += `${d},${n},${cum_val}\n`;
+                        cum_val = 0;
+                    });
+
+                });
+                document.getElementById("csv_result").value = text;
+            }
+        </script>
+    </body>
+</html>
